@@ -1,0 +1,33 @@
+// ------------------------------------------------------------------
+// Transitive dependencies of this project determined from the
+// Apache Maven POM organized by organization.
+//
+// For a list of transitive depencies of this project determined
+// from the Apache Maven POM organized by licenses see the
+// DEPENDENCIES-BY-LICENSE file.
+// ------------------------------------------------------------------
+
+
+From: 'an unknown organization'
+  - servlet-api  javax.servlet:servlet-api:jar:2.5
+
+  - org.osgi.compendium  org.osgi:org.osgi.compendium:jar:4.1.0
+
+  - org.osgi.core  org.osgi:org.osgi.core:jar:4.1.0
+
+
+From: 'QOS.ch' (http://www.qos.ch)
+  - SLF4J API Module (http://www.slf4j.org) org.slf4j:slf4j-api:jar:1.6.1
+    License: MIT License  (http://www.opensource.org/licenses/mit-license.php)
+
+From: 'The Apache Software Foundation' (http://www.apache.org/)
+  - Commons IO (http://commons.apache.org/io/) commons-io:commons-io:jar:2.4
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Annotations for SCR (http://felix.apache.org/org.apache.felix.scr.annotations/) org.apache.felix:org.apache.felix.scr.annotations:jar:1.9.8
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Stanbol Commons Data File Provider (http://www.apache.org/stanbol-parent/org.apache.stanbol.commons.stanboltools.datafileprovider/) org.apache.stanbol:org.apache.stanbol.commons.stanboltools.datafileprovider:bundle:1.0.0-SNAPSHOT
+    License: Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+
+
+
