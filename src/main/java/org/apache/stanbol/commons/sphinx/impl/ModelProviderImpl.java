@@ -9,18 +9,18 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.stanbol.commons.sphinx.LanguageModel;
 import org.apache.stanbol.commons.sphinx.ModelProvider;
+import org.apache.stanbol.commons.sphinx.model.BaseModel;
 import org.apache.stanbol.commons.stanboltools.datafileprovider.DataFileProvider;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -49,15 +49,13 @@ public class ModelProviderImpl implements ModelProvider{
     @Reference
     private DataFileProvider dataFileProvider;
     
-    final private String tempPath = System.getProperty("java.io.tmpdir");
     
     
-    private String BundelName="org.apache.stanbol.data.sphinx.model.wsj";
 
     /**
     * Map holding the already built Model
     */
-    private Map<String,String> ModeLocation = new HashMap<String,String>();
+    protected Map<HashSet<String>, BaseModel> models = new HashMap<HashSet<String>,BaseModel>();
 
     
     /**
@@ -80,152 +78,73 @@ public class ModelProviderImpl implements ModelProvider{
     
     
     
-    @Override
-	public LanguageModel getDefaultModel(String language) {
-		// TODO Auto-generated method stub
-    	return initModel( language);
-		
-	}
+    
 	@Override
-	public LanguageModel getModel(String bundlename, String language) {
-		// TODO Auto-generated method stub
-		
-		this.BundelName=bundlename;
-		return initModel( language);
+	public BaseModel getModel(String language, HashSet<String> models, BaseModel modelType) {
+		return initModel(modelType.getCustomModel(language,models),modelType);		
 	}
-    /**
+	
+	@Override
+	public BaseModel getDefaultModel(String language, BaseModel modelType ) {
+		return initModel(modelType.getDefaultModel(language),modelType);
+	}
+	/**
      * It return the model location to the SpeechToText Engine.
      * @param <T>
      * @return
      * @throws IllegalFormatException
      * @throws IOException
      */
-    private LanguageModel initModel(String language) {
-    	if(initAcousticModel()) {
-    		if(initLanguageModel(language)) {
-    			if(initDictionary(language))
-    				return (new LanguageModel(ModeLocation));
-    		}
-    	}
-    	return null;
-    }
-    
-    
-    
-    /**
-     * Builds Acoustic model files to temp directory.
-     * @return
-     */
-    private boolean initAcousticModel()
-    {
-    	String acousticResource[]={"feat.params", "mdef", "means", "mixture_weights", "noisedict", "transition_matrices", "variances"};
-    	InputStream modelDataStream = null;
-    	String tempPath=this.tempPath+"/acoustic";
-    	new File(tempPath).mkdir(); //this needs to be handled
-    	for(String resource : acousticResource ) {
-    		try {
-    			modelDataStream = lookupModelStream(resource);
-    		}
-    		catch (IOException e) {
-                log.debug("Unable to load Resource {} via the DataFileProvider",resource);
-                return false;
-    		}
-    		if(modelDataStream == null){
-                log.debug("Unable to load Resource {} via the DataFileProvider",resource);
-                return false;
+    @SuppressWarnings("unchecked")
+	private <T> T initModel(HashSet<String> name, BaseModel modelType) {
+    	Object model = models.get(name);
+        if(model != null) {
+            if(modelType.getClass().isAssignableFrom(model.getClass())){
+                return (T) model;
+            } 
+            else {
+                throw new IllegalStateException(String.format(
+                    "Incompatible Model Types for name '%s': present=%s | requested=%s",
+                    name,model.getClass(),modelType));
             }
-    		try {
-    	    	
-    			createTempResource(modelDataStream,resource,tempPath);
-    		}
-    		catch(PrivilegedActionException e) {
-    			log.debug("Privledeged Exception thrown on Acoustic Language Model", e);
-    			return false;
-    		}
-    		finally {
-    			IOUtils.closeQuietly(modelDataStream);
-    		}
-    	}
-        ModeLocation.put("acoustic", tempPath);
-        return true;
+        } 
+        else {
+        	InputStream modelDataStream;
+        	for(String modelname: name)
+        	{
+        		String m[]=modelname.split("[-]");
+        		
+        		try {
+        			modelDataStream = lookupModelStream(modelname);
+        		} catch (IOException e) {
+        			log.debug("Unable to load Resource {} via the DataFileProvider",name);
+        			return null;
+        		}
+        		if(modelDataStream == null){
+            		System.out.println("Dict name = "+modelname);
+
+        			log.debug("Unable to load Resource {} via the DataFileProvider",name);
+        			return null;
+        		}
+        		try {
+        			createTempResource(modelDataStream,m[1], modelType.toString());
+        		}
+        		catch(PrivilegedActionException e) {
+        			log.debug("Privledeged Exception thrown on Acoustic Language Model", e);
+        			return null;
+        		}
+        		modelType.setLocation(m[1]);
+        	}
+        	
+            models.put(name, modelType);
+            return (T) modelType;
+        }
     }
     
-    /**
-     * Builds Language Model file to temp directory. 
-     * @return
-     */
-    private boolean initLanguageModel(String language)
-    {
-    	
-    	InputStream modelDataStream;
-    	String resource=language+"-us.lm.dmp";
-    	try {
-			modelDataStream = lookupModelStream(resource);    			
-		}
-		catch (IOException e) {
-            log.debug("Unable to load Resource {} via the DataFileProvider",resource);
-            return false;
-        }
-    	
-		if(modelDataStream == null){
-            log.debug("Unable to load Resource {} via the DataFileProvider",resource);
-            return false;
-        }
-		try {
-			createTempResource(modelDataStream,resource,this.tempPath);
-		}
-		catch(PrivilegedActionException e) {
-			log.debug("Privledeged Exception thrown on building Language Model", e);
-            return false;
-		}
-		finally {
-			IOUtils.closeQuietly(modelDataStream);
-		}
-    	ModeLocation.put("language", this.tempPath+"/"+resource);
-    	return true;
-    }
-    
-    /**
-     * Builds Dictionary file to temp directory.
-     * @return
-     */
-    private boolean initDictionary(String language)
-    {
-    	InputStream modelDataStream;
-    	String resource=language+"-cmudict.0.6d";
-    	try {
-			modelDataStream = lookupModelStream(resource);    			
-		}
-		catch (IOException e) {
-            log.debug("Unable to load Resource {} via the DataFileProvider",resource);
-            return false;
-        }
-		if(modelDataStream == null){
-            log.debug("Unable to load Resource {} via the DataFileProvider",resource);
-            return false;
-        }
-		try{
-			createTempResource(modelDataStream,resource,this.tempPath);
-		}catch(PrivilegedActionException e) {
-			log.debug("Privledeged Exception thrown on building Dictionary Model", e);
-            return false;
-		}
-		finally {
-			IOUtils.closeQuietly(modelDataStream);
-		}
-		
-    	ModeLocation.put("dictionary", this.tempPath+"/"+resource);
-        return true;
-    }
-    /**
-     * Deletes the Temp resources when model files are not required. 
-     * @param modelDataStream InputStream of the model file
-     * @param resourceName name of the model file
-     * @param path to the model files location
-     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	private void createTempResource(final InputStream modelDataStream, String resourceName, String path) throws PrivilegedActionException
     {
+    	System.out.println("Reosurce Location = "+resourceName+" path = "+path);
 	    final File resource = new File(path+"/"+resourceName);
 	    
     	AccessController.doPrivileged(new PrivilegedAction() {
@@ -242,7 +161,31 @@ public class ModelProviderImpl implements ModelProvider{
          });  
     }
     
-    /***********************************************************************************************************************************************/
+    /**
+     * Lookup an Sphinx data file via the {@link #dataFileProvider}
+     * @param modelName the name of the model
+     * @return the stream or <code>null</code> if not found
+     * @throws IOException an any error while opening the model file
+     */
+    protected InputStream lookupModelStream(final String modelName) throws IOException {
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
+                @Override
+                public InputStream run() throws IOException {
+                    return dataFileProvider.getInputStream(null, modelName,null);
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Exception e = pae.getException();
+            if(e instanceof IOException){
+                throw (IOException)e;
+            } else {
+                throw RuntimeException.class.cast(e);
+            }
+        }        
+    }
+
+
     @Deactivate
     protected void deactivate(ComponentContext ctx){
         log.debug("deactivating {}",this.getClass().getSimpleName() );
@@ -250,10 +193,11 @@ public class ModelProviderImpl implements ModelProvider{
     }
     public void clearTempResource()
     {
-    	Iterator<String> keySetIterator = ModeLocation.keySet().iterator();
+    	Iterator<HashSet<String>> keySetIterator = models.keySet().iterator();
+
     	while(keySetIterator.hasNext()){
-    		  String key = keySetIterator.next();
-    		  File directory = new File(ModeLocation.get(key));
+    		  HashSet<String> key = keySetIterator.next();
+    		  File directory = new File(models.get(key).toString());
     		  if(directory.exists()){
     	           try{
     	               delete(directory);
@@ -294,31 +238,4 @@ public class ModelProviderImpl implements ModelProvider{
     		log.debug("File is deleted : " + file.getAbsolutePath());
     	}
     } 
-    /**********************************************************************************************************************************************/	
-    
-    /**
-     * Lookup an Sphinx data file via the {@link #dataFileProvider}
-     * @param modelName the name of the model
-     * @return the stream or <code>null</code> if not found
-     * @throws IOException an any error while opening the model file
-     */
-    protected InputStream lookupModelStream(final String modelName) throws IOException {
-        try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
-                @Override
-                public InputStream run() throws IOException {
-                    return dataFileProvider.getInputStream(BundelName, modelName,null);
-                }
-            });
-        } catch (PrivilegedActionException pae) {
-            Exception e = pae.getException();
-            if(e instanceof IOException){
-                throw (IOException)e;
-            } else {
-                throw RuntimeException.class.cast(e);
-            }
-        }        
-    }
-	
-    
 }

@@ -1,19 +1,14 @@
 package org.apache.stanbol.commons.sphinx;
 
+import java.util.HashSet;
+
+import org.apache.stanbol.commons.sphinx.model.BaseModel;
+
 
 public interface ModelProvider {
 	
-	/**
-	 * Gets for the default model for the parsed language
-	 * @param language
-	 * @return LanguageModel
-	 */
-	public LanguageModel getDefaultModel(String language);
-	/**
-	 * Gets for a specific model for the parsed language
-	 * @param bundlename
-	 * @param language
-	 * @return LanguageModel
-	 */
-	public LanguageModel getModel(String bundlename, String language);
+	public BaseModel getDefaultModel(String language, BaseModel modelType );
+	
+	//public <T> T getModel(String bundlename, String language);
+	public BaseModel getModel(String language, HashSet<String> models, BaseModel modelType);
 }
