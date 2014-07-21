@@ -10,7 +10,6 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -41,30 +40,19 @@ public class ModelProviderImpl implements ModelProvider{
 	/**
      * The logger
      */
-	
-	
-		
-	
     private final Logger log = LoggerFactory.getLogger(getClass());
     @Reference
     private DataFileProvider dataFileProvider;
-    
-    
-    
-
     /**
     * Map holding the already built Model
     */
     protected Map<HashSet<String>, BaseModel> models = new HashMap<HashSet<String>,BaseModel>();
-
-    
     /**
      * Default constructor
      */
     public ModelProviderImpl(){ 
     	super();
     }
-    
     /**
      * Constructor intended to be used when running outside an OSGI environment
      * (e.g. when used for UnitTests)
@@ -74,9 +62,6 @@ public class ModelProviderImpl implements ModelProvider{
         this();
         this.dataFileProvider = dataFileProvider;
     }
-    
-    
-    
     
     
 	@Override
@@ -89,12 +74,12 @@ public class ModelProviderImpl implements ModelProvider{
 		return initModel(modelType.getDefaultModel(language),modelType);
 	}
 	/**
-     * It return the model location to the SpeechToText Engine.
-     * @param <T>
-     * @return
-     * @throws IllegalFormatException
-     * @throws IOException
-     */
+	 * Initializes the Model files i.e. storing the copy in /tmp folder
+	 * @param name Model File names
+	 * @param modelType 
+	 * @return
+	 */
+     
     @SuppressWarnings("unchecked")
 	private <T> T initModel(HashSet<String> name, BaseModel modelType) {
     	Object model = models.get(name);
@@ -140,7 +125,13 @@ public class ModelProviderImpl implements ModelProvider{
             return (T) modelType;
         }
     }
-    
+    /**
+     * 
+     * @param modelDataStream InputStream of the Model, received from DataFileProvider Service
+     * @param resourceName Model File Name
+     * @param path path to copy the @resourceName i.e. /tmp
+     * @throws PrivilegedActionException
+     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	private void createTempResource(final InputStream modelDataStream, String resourceName, String path) throws PrivilegedActionException
     {
@@ -186,6 +177,10 @@ public class ModelProviderImpl implements ModelProvider{
     }
 
 
+    /**
+     * For Clearing /tmp resource
+     * @param ctx
+     */
     @Deactivate
     protected void deactivate(ComponentContext ctx){
         log.debug("deactivating {}",this.getClass().getSimpleName() );
