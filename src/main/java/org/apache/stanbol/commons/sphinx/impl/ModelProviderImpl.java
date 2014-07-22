@@ -106,7 +106,7 @@ public class ModelProviderImpl implements ModelProvider{
         			return null;
         		}
         		if(modelDataStream == null){
-            		System.out.println("Dict name = "+modelname);
+            		//System.out.println("Dict name = "+modelname);
 
         			log.debug("Unable to load Resource {} via the DataFileProvider",name);
         			return null;
@@ -135,7 +135,7 @@ public class ModelProviderImpl implements ModelProvider{
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	private void createTempResource(final InputStream modelDataStream, String resourceName, String path) throws PrivilegedActionException
     {
-    	System.out.println("Reosurce Location = "+resourceName+" path = "+path);
+    	//System.out.println("Reosurce Location = "+resourceName+" path = "+path);
 	    final File resource = new File(path+"/"+resourceName);
 	    
     	AccessController.doPrivileged(new PrivilegedAction() {

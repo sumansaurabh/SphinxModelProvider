@@ -40,7 +40,7 @@ public class ClasspathDataFileProvider implements DataFileProvider {
     
     private String symbolicName;
     
-    ClasspathDataFileProvider(String bundleSymbolicName) {
+    public ClasspathDataFileProvider(String bundleSymbolicName) {
         symbolicName = bundleSymbolicName;
     }
     
