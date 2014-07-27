@@ -182,12 +182,16 @@ public class ModelProviderImpl implements ModelProvider{
      * @param ctx
      */
     @Deactivate
-    protected void deactivate(ComponentContext ctx){
+    public void deactivate(ComponentContext ctx){
         log.debug("deactivating {}",this.getClass().getSimpleName() );
         clearTempResource(); //clean up temp resources
     }
-    public void clearTempResource()
+    private void clearTempResource()
     {
+    	if(models==null) {
+    		log.debug("Already Deactiavted {}",this.getClass().getSimpleName() );
+    		return ;
+    	}
     	Iterator<HashSet<String>> keySetIterator = models.keySet().iterator();
 
     	while(keySetIterator.hasNext()){
