@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../HANGOVER.cpp 
+../codejam1.cpp 
 
 OBJS += \
-./HANGOVER.o 
+./codejam1.o 
 
 CPP_DEPS += \
-./HANGOVER.d 
+./codejam1.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

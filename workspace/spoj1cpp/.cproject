@@ -42,15 +42,15 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.225894624.1690310143" name="MMMGAME.cpp" rcbsApplicability="disable" resourcePath="MMMGAME.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1282728347.1859939415">
-						<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1282728347.1859939415" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1282728347"/>
-					</fileInfo>
 					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.225894624.1693035373" name="FAVDICE.CPP" rcbsApplicability="disable" resourcePath="FAVDICE.CPP" toolsToInvoke=""/>
 					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.225894624.831027426" name="PERMUT2.CPP" rcbsApplicability="disable" resourcePath="PERMUT2.CPP" toolsToInvoke=""/>
+					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.225894624.1350674474" name="qkp.cpp" rcbsApplicability="disable" resourcePath="qkp.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1282728347.647835123">
+						<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1282728347.647835123" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1282728347"/>
+					</fileInfo>
 					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.225894624.1108893181" name="CANDY3.CPP" rcbsApplicability="disable" resourcePath="CANDY3.CPP" toolsToInvoke=""/>
 					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.225894624.726903789" name="STAPAR.CPP" rcbsApplicability="disable" resourcePath="STAPAR.CPP" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="MMMGAME.cpp|OVFL.cpp|CENCRY.cpp|DIG.cpp|KAMIL.cpp|GPACALC.cpp|YUMMY.cpp|NGM.cpp|NSTEPS.cpp|AE00.cpp|LCMSUM.cpp|BMJ.cpp|BEENUMS.cpp|AMR11E.cpp|JAVAC.cpp|FASHION.cpp|FAVDICE.CPP|DANGER.cpp|CANDY3.CPP|PERMUT2.CPP|MIRRORED.cpp|STAPAR.CPP|GNYO7B.cpp|NUMGUESS.cpp|DIVSUM.cpp|BTCODE_D.cpp|lcs1.cpp|pour1.cpp|rpn.cpp|prime.cpp|piggybank.cpp|palinnum.cpp|cmpls.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="qkp.cpp|QKP.cpp|TRICOUNT.cpp|WILLIST.cpp|LASTDIG.cpp|LCS.cpp|BUSYMAN.cpp|que1.cpp|QUE1.cpp|DEFKIN.cpp|DRINK.cpp|MAXLN.cpp|BISHOPS.cpp|OFFSIDE.cpp|HANGOVER.cpp|MMMGAME.cpp|OVFL.cpp|CENCRY.cpp|DIG.cpp|KAMIL.cpp|GPACALC.cpp|YUMMY.cpp|NGM.cpp|NSTEPS.cpp|AE00.cpp|LCMSUM.cpp|BMJ.cpp|BEENUMS.cpp|AMR11E.cpp|JAVAC.cpp|FASHION.cpp|FAVDICE.CPP|DANGER.cpp|CANDY3.CPP|PERMUT2.CPP|MIRRORED.cpp|STAPAR.CPP|GNYO7B.cpp|NUMGUESS.cpp|DIVSUM.cpp|BTCODE_D.cpp|lcs1.cpp|pour1.cpp|rpn.cpp|prime.cpp|piggybank.cpp|palinnum.cpp|cmpls.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -73,15 +73,15 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.release.1992307322." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.release.889016850" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.release">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1885848870" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
-							<builder buildPath="${workspace_loc:/spoj1cpp/Release}" id="cdt.managedbuild.builder.gnu.cross.1738745592" managedBuildOn="true" name="Gnu Make Builder.Release" superClass="cdt.managedbuild.builder.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/spoj1cpp/Release}" id="cdt.managedbuild.builder.gnu.cross.1738745592" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1316812176" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.755019104" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.debugging.level.1421747468" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.755019104" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1421747468" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.7886633" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.199110535" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
-								<option id="gnu.cpp.compiler.option.optimization.level.1593285678" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.885201016" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.optimization.level.1593285678" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.885201016" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1077427609" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1126130350" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>

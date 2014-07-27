@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import edu.cmu.sphinx.api.Configuration;
 
-//import edu.cmu.sphinx.linguist.acoustic.AcousticModel;
 
 
 public class SphinxConfig {

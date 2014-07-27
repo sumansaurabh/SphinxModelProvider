@@ -23,7 +23,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +36,6 @@ import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.stanbol.commons.sphinx.impl.ModelProviderImpl;
 import org.apache.stanbol.enhancer.servicesapi.Blob;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
@@ -67,9 +65,8 @@ import edu.cmu.sphinx.result.WordResult;
 @Component(immediate = true, metatype = true, inherit = true)
 @Service
 @Properties(value = {
-    @Property(name = EnhancementEngine.PROPERTY_NAME, value = "Speech2Text"),
-    @Property(name=SpeechToTextEngine.UNMAPPED_PROPERTIES,boolValue=SpeechToTextEngine.DEFAULT_UNMAPPED_PROPERTIES_STATE)
-
+    @Property(name = EnhancementEngine.PROPERTY_NAME, value = "SpeechToText"),
+    @Property(name = SpeechToTextEngine.DEFAULT_LANGUAGE, value= "en")
 })
 public class SpeechToTextEngine extends AbstractEnhancementEngine<RuntimeException,RuntimeException> 
 implements EnhancementEngine, ServiceProperties {
@@ -80,24 +77,11 @@ implements EnhancementEngine, ServiceProperties {
     private static final Logger log = LoggerFactory.getLogger(SpeechToTextEngine.class);
 
 	
-	public static final String UNMAPPED_PROPERTIES = "stanbol.engine.sphinx.mapping.unmapped";//need to work on this
-    public static final boolean DEFAULT_UNMAPPED_PROPERTIES_STATE = false;
     protected static final Charset UTF8 = Charset.forName("UTF-8");
+    public static final String DEFAULT_LANGUAGE = "stanbol.engines.SpeechToText.DEFAULT_LANGUAGE";
 
     private SphinxConfig config;
     
-    /**
-     * Include also properties without a namespace. Currently those are ignored
-     */
-    private boolean includeAllUnmappedProperties = false;
-    /**
-     * If <code>true</code> unmapped properties are added by using
-     * <code>urn:sphinx.apache.org:sphinx:{property-name}</code> to the URI of the
-     * contentItem.
-     */
-    private boolean includeUnmappedProperties;
-    
-
     
     /**
      * The {@link ContentItemFactory} is used to create {@link Blob}s for the
@@ -106,37 +90,35 @@ implements EnhancementEngine, ServiceProperties {
     @Reference
     private ContentItemFactory ciFactory;
     
+    public SpeechToTextEngine() {}
+    
     /**
      * Used by the unit tests to init the {@link ContentItemFactory} outside
      * an OSGI environment.
      * @param cifactory
      */
-    public SpeechToTextEngine() {}
-    
     public SpeechToTextEngine(ContentItemFactory cifactory) {
         this.ciFactory = cifactory;
     }
     
     
+    @Override
+    protected void activate(ComponentContext ctx) throws ConfigurationException {
+	super.activate(ctx);
+    }
     
-
-    
-    
-   
     
     @Override
     protected void deactivate(ComponentContext ctx) throws RuntimeException {
         //this.config = null;
-        try {
-		super.deactivate(ctx);
-	} catch (Exception e) {
-            e.printStackTrace();
-	}
+	super.deactivate(ctx);
+	
     }
     
     /**
      * @return if and how (asynchronously) we can enhance a ContentItem
      */
+    @Override
     public int canEnhance(ContentItem ci) throws EngineException {
         // check if content is present
         try {
@@ -152,33 +134,32 @@ implements EnhancementEngine, ServiceProperties {
         // no reason why we should require to be executed synchronously
         return ENHANCE_ASYNC;
     }
-    @Override
-    protected void activate(ComponentContext ctx) throws ConfigurationException {
-        try {
-		super.activate(ctx);
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-		e.printStackTrace();
-            }
-        //includeUnmappedProperties = getBoolean(ctx.getProperties(), UNMAPPED_PROPERTIES, DEFAULT_UNMAPPED_PROPERTIES_STATE);
-    }
+    
     
     @SuppressWarnings("deprecation")
-	public void computeEnhancements(ContentItem ci) throws EngineException {
+    @Override
+    public void computeEnhancements(ContentItem ci) throws EngineException {
         config=new SphinxConfig(ci);
         List<String> resultPredicted;
         final InputStream in;
-
         Configuration configuration = config.getConfiguration();
-        
-        
         try {
             in = ci.getStream();
-            //get the (generated or submitted) text version of the ContentItem
+            System.out.print(in);
+            if(in==null)
+            {
+                            System.out.println("returning"+in);
+                            return;
+            }
+
+            //Extracting Text from Media File parsed
             StreamSpeechRecognizer recognizer = new StreamSpeechRecognizer(configuration);
             recognizer.startRecognition(in);
             SpeechResult result;
             resultPredicted=new ArrayList<String>();
+            
+           //Recognising the Media Data and storing each line in @resultPredicted
+            
             while ((result = recognizer.getResult()) != null)
             {
                 List<WordResult> wordlist=result.getWords();
@@ -221,7 +202,7 @@ implements EnhancementEngine, ServiceProperties {
             ci.addPart(textBlobUri, plainTextSink.getBlob());
             
             
-            plainTextSink = null;
+            plainTextSink=null;
             
             ci.getLock().writeLock().lock();
             /*
