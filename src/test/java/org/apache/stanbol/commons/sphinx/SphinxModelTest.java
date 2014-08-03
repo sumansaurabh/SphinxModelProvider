@@ -57,9 +57,9 @@ public class SphinxModelTest {
     public void testCustomLanguageModel() throws IOException{
     	BaseModel modelType = new LanguageModel();
 		HashSet<String> modelName=new HashSet<String>();
-		modelName.add("us.lm.dmp");
+		modelName.add("en-us.lm.dmp");
 
-    	modelType=MP.getModel("en",modelName, modelType);    	//MP.getDefaultModel("en", modelType);
+    	modelType=MP.getModel(modelName, modelType);    	//MP.getDefaultModel("en", modelType);
     	//MP.clearTempResource();
     	Assert.assertEquals(modelType.getClass(), (new LanguageModel()).getClass());
         Assert.assertNotNull(modelType);
@@ -69,21 +69,21 @@ public class SphinxModelTest {
     	String acousticResource[]={"feat.params", "mdef", "means", "mixture_weights", "noisedict", "transition_matrices", "variances"};
     	BaseModel modelType = new AcousticModel();
 		HashSet<String> modelName=new HashSet<String>(Arrays.asList(acousticResource));
-    	modelType=MP.getModel("en",modelName, modelType);//    	MP.clearTempResource();
+    	modelType=MP.getModel(modelName, modelType);//    	MP.clearTempResource();
     	Assert.assertEquals(modelType.getClass(), (new AcousticModel()).getClass());
         Assert.assertNotNull(modelType);
     }
-    /*
+    
     @Test
     public void testCustomDictionaryModel() throws IOException{
     	BaseModel modelType = new DictionaryModel();
 		HashSet<String> modelName=new HashSet<String>();
-		modelName.add("digits.dict"); //This test not passed
+		modelName.add("en-digits.dict"); //This test not passed
 
-    	modelType=MP.getModel("en",modelName, modelType);
+    	modelType=MP.getModel(modelName, modelType);
 //    	MP.clearTempResource();
     	Assert.assertEquals(modelType.getClass(), (new DictionaryModel()).getClass());
         Assert.assertNotNull(modelType);
-    }*/
+    }
     
 }

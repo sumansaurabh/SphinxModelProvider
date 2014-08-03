@@ -1,5 +1,6 @@
 package org.apache.stanbol.commons.sphinx.model;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 public class AcousticModel implements BaseModel {
@@ -11,10 +12,7 @@ public class AcousticModel implements BaseModel {
 	@Override
 	public HashSet<String> getDefaultModel(String language) {
     	String acousticResource[]={"feat.params", "mdef", "means", "mixture_weights", "noisedict", "transition_matrices", "variances"};
-    	HashSet<String> modelName = new HashSet<String>();
-    	for(String m: acousticResource){
-			modelName.add(String.format("%s-%s", language,m));
-    	}
+    	HashSet<String> modelName = new HashSet<String>(Arrays.asList(acousticResource));
 		return modelName;
 	}
 
@@ -24,14 +22,6 @@ public class AcousticModel implements BaseModel {
 		
 	}
 
-	@Override
-	public HashSet<String> getCustomModel(String language, HashSet<String> models) {
-		/*
-		HashSet<String> modelName=new HashSet<String>();
-		for(String m: models)
-			modelName.add(String.format("%s-%s", language,m));*/
-		return getDefaultModel(language);
-	}
 	
 	public String toString() {
 		return ModelLocation+"/"+"acoustic";

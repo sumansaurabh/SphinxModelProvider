@@ -44,9 +44,11 @@ public class ModelProviderImpl implements ModelProvider{
     @Reference
     private DataFileProvider dataFileProvider;
     /**
-    * Map holding the already built Model
+    * Map holding the already built Model needed on cleaning the temp resources
     */
     protected Map<HashSet<String>, BaseModel> models = new HashMap<HashSet<String>,BaseModel>();
+    
+    private String bundleSymbolicName=null; //Getter for bundle symbolic name
     /**
      * Default constructor
      */
@@ -65,14 +67,19 @@ public class ModelProviderImpl implements ModelProvider{
     
     
 	@Override
-	public BaseModel getModel(String language, HashSet<String> models, BaseModel modelType) {
-		return initModel(modelType.getCustomModel(language,models),modelType);		
+	public BaseModel getModel(HashSet<String> models, BaseModel modelType) {
+		return initModel(models,modelType);		
 	}
 	
 	@Override
 	public BaseModel getDefaultModel(String language, BaseModel modelType ) {
 		return initModel(modelType.getDefaultModel(language),modelType);
 	}
+	@Override
+	public void setBundleSymbolicName(String bundleSymbolicName) {
+		this.bundleSymbolicName=bundleSymbolicName;
+	}
+	
 	/**
 	 * Initializes the Model files i.e. storing the copy in /tmp folder
 	 * @param name Model File names
@@ -82,6 +89,7 @@ public class ModelProviderImpl implements ModelProvider{
      
     @SuppressWarnings("unchecked")
 	private <T> T initModel(HashSet<String> name, BaseModel modelType) {
+
     	Object model = models.get(name);
         if(model != null) {
             if(modelType.getClass().isAssignableFrom(model.getClass())){
@@ -97,7 +105,6 @@ public class ModelProviderImpl implements ModelProvider{
         	InputStream modelDataStream;
         	for(String modelname: name)
         	{
-        		String m[]=modelname.split("[-]");
         		
         		try {
         			modelDataStream = lookupModelStream(modelname);
@@ -107,18 +114,17 @@ public class ModelProviderImpl implements ModelProvider{
         		}
         		if(modelDataStream == null){
             		//System.out.println("Dict name = "+modelname);
-
         			log.debug("Unable to load Resource {} via the DataFileProvider",name);
         			return null;
         		}
         		try {
-        			createTempResource(modelDataStream,m[1], modelType.toString());
+        			createTempResource(modelDataStream,modelname, modelType.toString());
         		}
         		catch(PrivilegedActionException e) {
         			log.debug("Privledeged Exception thrown on Acoustic Language Model", e);
         			return null;
         		}
-        		modelType.setLocation(m[1]);
+        		modelType.setLocation(modelname);
         	}
         	
             models.put(name, modelType);
@@ -163,7 +169,7 @@ public class ModelProviderImpl implements ModelProvider{
             return AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
                 @Override
                 public InputStream run() throws IOException {
-                    return dataFileProvider.getInputStream(null, modelName,null);
+                    return dataFileProvider.getInputStream(bundleSymbolicName, modelName,null);
                 }
             });
         } catch (PrivilegedActionException pae) {
