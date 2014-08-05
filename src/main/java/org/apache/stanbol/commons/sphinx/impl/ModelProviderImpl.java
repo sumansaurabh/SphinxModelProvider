@@ -32,19 +32,18 @@ import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.commons.sphinx.ModelProvider;
+import org.apache.stanbol.commons.sphinx.model.AcousticModel;
 import org.apache.stanbol.commons.sphinx.model.BaseModel;
+import org.apache.stanbol.commons.sphinx.model.DictionaryModel;
+import org.apache.stanbol.commons.sphinx.model.LanguageModel;
 import org.apache.stanbol.commons.stanboltools.datafileprovider.DataFileProvider;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OSGI service that let you load OpenNLP Models via the Stanbol 
- * {@link DataFileProvider} infrastructure. This allows users to copy models
- * to the 'datafiles' directory or developer to provide models via via OSGI
- * bundles.<p>
- * This service also provides methods that directly return the Sphinx component
- * wrapping the model.
+ * Makes the Model file available to {@link SpeechToTextEngine}.
+ * 
  * Currently InputStream provided by DataFileProvider is saved as 
  * model file in temp folder. Sphinx needs model file location to extract the
  * speech content and DataFileProvider service provides InputStream of data only.
@@ -88,7 +87,8 @@ public class ModelProviderImpl implements ModelProvider{
     
     
 	@Override
-	public BaseModel getModel(HashSet<String> models, BaseModel modelType) {
+	public BaseModel getModel(HashSet<String> models, BaseModel modelType, String bundleSymbolicName) {
+		this.bundleSymbolicName=bundleSymbolicName;
 		return initModel(models,modelType);		
 	}
 	
@@ -96,18 +96,15 @@ public class ModelProviderImpl implements ModelProvider{
 	public BaseModel getDefaultModel(String language, BaseModel modelType ) {
 		return initModel(modelType.getDefaultModel(language),modelType);
 	}
-	@Override
-	public void setBundleSymbolicName(String bundleSymbolicName) {
-		this.bundleSymbolicName=bundleSymbolicName;
-	}
+	
 	
 	/**
 	 * Initializes the Model files i.e. storing the copy in /tmp folder
-	 * @param name Model File names
-	 * @param modelType 
-	 * @return BaseModel {LanguageModel, AcousticModel, DictionaryModel}
+	 * @param name Model File name set
+	 * @param modelType {@link LanguageModel}, {@link AcousticModel}, {@link DictionaryModel}
+	 * @return {@link LanguageModel}, {@link AcousticModel}, {@link DictionaryModel}
 	 */
-     
+    
     @SuppressWarnings("unchecked")
 	private <T> T initModel(HashSet<String> name, BaseModel modelType) {
 
@@ -153,7 +150,7 @@ public class ModelProviderImpl implements ModelProvider{
     }
     /**
      * 
-     * @param modelDataStream InputStream of the Model, received from DataFileProvider Service
+     * @param modelDataStream {@link InputStream} of the Model, received from {@link DataFileProvider} Service
      * @param resourceName Model File Name
      * @param path path to copy the @resourceName i.e. /tmp
      * @throws PrivilegedActionException
@@ -211,6 +208,24 @@ public class ModelProviderImpl implements ModelProvider{
         log.debug("deactivating {}",this.getClass().getSimpleName() );
         clearTempResource(); //clean up temp resources
     }
+    
+    /**
+     * Remove the Model files when they become unavialbe to Stanbol
+     * @param modelType {@link LanguageModel}, {@link AcousticModel}, {@link DictionaryModel} 
+     */
+    public void removeUnavailableResource(BaseModel modelType) {
+    	File directory = new File(models.get(modelType).toString());
+    	if(directory.exists()){
+	           try{
+	               delete(directory);
+	           }catch(IOException e){
+	        	   log.debug("Unable to clear temp Resource {} to temp");
+	           }
+		  }
+    }
+    /** 
+     * For completely cleaning the tmp resource when {@link ModelProvider} bundle is deactivated
+     */
     private void clearTempResource()
     {
     	if(models==null) {

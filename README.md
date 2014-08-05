@@ -15,9 +15,10 @@
   limitations under the License.
 -->
 
-# Apache Stanbol Sphinx Module  https://github.com/sumansaurabh/SphinxModelProvider
+# Apache Stanbol Sphinx Module  
 
 This module provides utilities for Speech TO Text Engine of Apache Stanbol.
+Repository: https://github.com/sumansaurabh/SphinxModelProvider
 
 ## SphnixModelProvider service
     :::java

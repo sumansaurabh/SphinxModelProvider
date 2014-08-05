@@ -16,7 +16,7 @@ package org.apache.stanbol.commons.sphinx.model;
 import java.util.HashSet;
 
 /**
- * Wraps up the model properties for @link DictionaryModel} 
+ * Wraps up the model properties for {@link DictionaryModel} 
  * 
  * @author Suman Saurabh
  *

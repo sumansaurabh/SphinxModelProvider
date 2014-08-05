@@ -16,7 +16,7 @@ package org.apache.stanbol.commons.sphinx.model;
 import java.util.HashSet;
 /**
  * This interface is for Sphinx- Models which wraps Model Properties. 
- * More properties can be added in future for  @link BaseModel
+ * More properties can be added in future for  {@link BaseModel}
  *
  * @author Suman Saurabh
  */

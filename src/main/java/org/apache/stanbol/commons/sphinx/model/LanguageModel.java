@@ -16,7 +16,7 @@ package org.apache.stanbol.commons.sphinx.model;
 import java.util.HashSet;
 
 /**
- * Wraps up the model properties for @link LanguageModel}
+ * Wraps up the model properties for {@link LanguageModel}
  *  
  * @author Suman Saurabh
  *

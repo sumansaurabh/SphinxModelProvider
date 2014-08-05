@@ -17,7 +17,7 @@ package org.apache.stanbol.commons.sphinx.model;
 import java.util.Arrays;
 import java.util.HashSet;
 /**
- * Wraps up the model properties for @link AcousticModel} 
+ * Wraps up the model properties for {@link AcousticModel} 
  * 
  * @author Suman Saurabh
  *
@@ -30,7 +30,7 @@ public class AcousticModel implements BaseModel {
 
 	@Override
 	public HashSet<String> getDefaultModel(String language) {
-    	String acousticResource[]={"feat.params", "mdef", "means", "mixture_weights", "noisedict", "transition_matrices", "variances"};
+    	String acousticResource[]={"feat.params", "mdef", "means", "mixture_weights", "noisedict", "transition_matrices", "variances","feature_transform"};
     	HashSet<String> modelName = new HashSet<String>(Arrays.asList(acousticResource));
 		return modelName;
 	}

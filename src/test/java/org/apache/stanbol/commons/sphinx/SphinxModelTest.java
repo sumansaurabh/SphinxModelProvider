@@ -22,9 +22,12 @@ import org.apache.stanbol.commons.sphinx.model.AcousticModel;
 import org.apache.stanbol.commons.sphinx.model.BaseModel;
 import org.apache.stanbol.commons.sphinx.model.DictionaryModel;
 import org.apache.stanbol.commons.sphinx.model.LanguageModel;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -32,16 +35,20 @@ import org.junit.Test;
  *
  */
 public class SphinxModelTest {
-	private static ModelProviderImpl MP;    
-    @BeforeClass
-    public static void init(){
+	
+	private static ModelProviderImpl MP;
+    private static final Logger log = LoggerFactory.getLogger(SphinxModelTest.class);
+
+    @Before
+    public void init(){
     	MP = new ModelProviderImpl(new ClasspathDataFileProvider("DUMMY"));
     }
 	
     
     @Test
     public void testDefaultLanguageModel() throws IOException{
-    	BaseModel modelType = new LanguageModel();
+    	log.info(">> Testing Default Language Model <<");
+   	BaseModel modelType = new LanguageModel();
     	modelType=MP.getDefaultModel("en", modelType);
     	//MP.getDefaultModel("en", modelType);
 //    	MP.clearTempResource();
@@ -50,6 +57,7 @@ public class SphinxModelTest {
     }
     @Test
     public void testDefaultAcousticModel() throws IOException{
+    	log.info(">> Testing Default Acoustic Model <<");
     	BaseModel modelType = new AcousticModel();
     	modelType=MP.getDefaultModel("en", modelType);
   //  	MP.clearTempResource();
@@ -59,6 +67,7 @@ public class SphinxModelTest {
     
     @Test
     public void testDefaultDictionaryModel() throws IOException{
+    	log.info(">> Testing Default Dictionary Model <<");
     	BaseModel modelType = new DictionaryModel();
     	modelType=MP.getDefaultModel("en", modelType);
     //	MP.clearTempResource();
@@ -68,21 +77,22 @@ public class SphinxModelTest {
     
     @Test
     public void testCustomLanguageModel() throws IOException{
+    	log.info(">> Testing Custom Language Model <<");
     	BaseModel modelType = new LanguageModel();
 		HashSet<String> modelName=new HashSet<String>();
 		modelName.add("en-us.lm.dmp");
 
-    	modelType=MP.getModel(modelName, modelType);    	//MP.getDefaultModel("en", modelType);
-    	//MP.clearTempResource();
+    	modelType=MP.getModel(modelName, modelType,null);    	
     	Assert.assertEquals(modelType.getClass(), (new LanguageModel()).getClass());
         Assert.assertNotNull(modelType);
     }
     @Test
     public void testCustomAcousticModel() throws IOException{
-    	String acousticResource[]={"feat.params", "mdef", "means", "mixture_weights", "noisedict", "transition_matrices", "variances"};
+    	log.info(">> Testing Custom Acoustic Model <<");
+    	String acousticResource[]={"feat.params", "mdef", "means", "mixture_weights", "noisedict", "transition_matrices", "variances","feature_transform"};
     	BaseModel modelType = new AcousticModel();
 		HashSet<String> modelName=new HashSet<String>(Arrays.asList(acousticResource));
-    	modelType=MP.getModel(modelName, modelType);//    	MP.clearTempResource();
+    	modelType=MP.getModel(modelName, modelType,null);//    	MP.clearTempResource();
     	Assert.assertEquals(modelType.getClass(), (new AcousticModel()).getClass());
         Assert.assertNotNull(modelType);
     }
@@ -90,14 +100,21 @@ public class SphinxModelTest {
     
     @Test
     public void testCustomDictionaryModel() throws IOException{
+    	log.info(">> Testing Custom Dictionary Model <<");
     	BaseModel modelType = new DictionaryModel();
 		HashSet<String> modelName=new HashSet<String>();
 		modelName.add("en-cmu.dict"); //This test not passed
 
-    	modelType=MP.getModel(modelName, modelType);
+    	modelType=MP.getModel(modelName, modelType,null);
 //    	MP.clearTempResource();
     	Assert.assertEquals(modelType.getClass(), (new DictionaryModel()).getClass());
         Assert.assertNotNull(modelType);
     }
-    
+    @After
+    public void unbindServices() {
+    	log.info(">> Cleaning resources <<");
+       	MP.deactivate(null);
+    	MP=null;
+    }
+	
 }
