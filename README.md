@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 
-# Apache Stanbol Sphinx Module
+# Apache Stanbol Sphinx Module  https://github.com/sumansaurabh/SphinxModelProvider
 
 This module provides utilities for Speech TO Text Engine of Apache Stanbol.
 
@@ -25,10 +25,7 @@ This module provides utilities for Speech TO Text Engine of Apache Stanbol.
     private ModelProvider modelProvider;
 
 The main functionality of this component is to handle the loading of Sphinx models by using the Apache Stanbol DatafileProvider infrastructure.
-SphnixModelProvider provides getters for getting Acoustic, Language, Dictioanry Model for a given Speech. Loaded models loaded as InputStream are
-copied to tmp folder as CMU Sphinx do not provides support for loading models as Stream, it needs file location and DatafileProvider only provides loading of models as Stream.
+SphnixModelProvider provides getters for getting Acoustic, Language, Dictioanry Model for a given Speech. Loaded models loaded as InputStream are copied to tmp folder as CMU Sphinx do not provides support for loading models as Stream, it needs file location and DatafileProvider only provides loading of models as Stream.
 
 Loading Model in tmp folder is done for temporary basis. An issue has been created for getting details of model location. 
 Stanbol-1355 https://issues.apache.org/jira/browse/STANBOL-1355 
-
->>>>>>> 9e56e717eb892c747b98c328c3a996f8dc16a6ae

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package org.apache.stanbol.commons.sphinx.impl;
 
 
@@ -26,9 +39,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Model Provider for SpeechToText Engine, this provides Acoustic, Language and 
- * Dictionary model to the Engine. Currently InputStream provided by DataFileProvider 
- * is used to build a Temp file as Sphinx needs model file location to extract the
+ * OSGI service that let you load OpenNLP Models via the Stanbol 
+ * {@link DataFileProvider} infrastructure. This allows users to copy models
+ * to the 'datafiles' directory or developer to provide models via via OSGI
+ * bundles.<p>
+ * This service also provides methods that directly return the Sphinx component
+ * wrapping the model.
+ * Currently InputStream provided by DataFileProvider is saved as 
+ * model file in temp folder. Sphinx needs model file location to extract the
  * speech content and DataFileProvider service provides InputStream of data only.
  * 
  * @author Suman Saurabh
@@ -41,14 +59,17 @@ public class ModelProviderImpl implements ModelProvider{
      * The logger
      */
     private final Logger log = LoggerFactory.getLogger(getClass());
+    
     @Reference
     private DataFileProvider dataFileProvider;
+    
     /**
     * Map holding the already built Model needed on cleaning the temp resources
     */
     protected Map<HashSet<String>, BaseModel> models = new HashMap<HashSet<String>,BaseModel>();
     
     private String bundleSymbolicName=null; //Getter for bundle symbolic name
+    
     /**
      * Default constructor
      */
@@ -84,7 +105,7 @@ public class ModelProviderImpl implements ModelProvider{
 	 * Initializes the Model files i.e. storing the copy in /tmp folder
 	 * @param name Model File names
 	 * @param modelType 
-	 * @return
+	 * @return BaseModel {LanguageModel, AcousticModel, DictionaryModel}
 	 */
      
     @SuppressWarnings("unchecked")
@@ -113,7 +134,6 @@ public class ModelProviderImpl implements ModelProvider{
         			return null;
         		}
         		if(modelDataStream == null){
-            		//System.out.println("Dict name = "+modelname);
         			log.debug("Unable to load Resource {} via the DataFileProvider",name);
         			return null;
         		}
@@ -141,7 +161,6 @@ public class ModelProviderImpl implements ModelProvider{
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	private void createTempResource(final InputStream modelDataStream, String resourceName, String path) throws PrivilegedActionException
     {
-    	//System.out.println("Reosurce Location = "+resourceName+" path = "+path);
 	    final File resource = new File(path+"/"+resourceName);
 	    
     	AccessController.doPrivileged(new PrivilegedAction() {
