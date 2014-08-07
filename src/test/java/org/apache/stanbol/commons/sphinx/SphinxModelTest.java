@@ -17,11 +17,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.apache.stanbol.commons.sphinx.impl.ModelProviderImpl;
-import org.apache.stanbol.commons.sphinx.model.AcousticModel;
-import org.apache.stanbol.commons.sphinx.model.BaseModel;
-import org.apache.stanbol.commons.sphinx.model.DictionaryModel;
-import org.apache.stanbol.commons.sphinx.model.LanguageModel;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
