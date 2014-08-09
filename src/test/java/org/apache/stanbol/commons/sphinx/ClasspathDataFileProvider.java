@@ -34,7 +34,7 @@ public class ClasspathDataFileProvider implements DataFileProvider {
     
     public static final String RESOURCE_BASE_PATH = "org/apache/stanbol/data/sphinx/";
     
-    public static final String RESOURCE_BASE_PATH_ACOUSTIC = "org/apache/stanbol/data/sphinx/en-us/";
+    //public static final String RESOURCE_BASE_PATH_ACOUSTIC = "org/apache/stanbol/data/sphinx/en-us/";
     
     private String symbolicName;
     
@@ -70,10 +70,10 @@ public class ClasspathDataFileProvider implements DataFileProvider {
             return null;
         }
         // load default Sphinx models from classpath (embedded in the default data bundle)
-        if(filename.compareTo("en-cmu.dict")==0||filename.compareTo("en-us.lm.dmp")==0)
+        //if(filename.compareTo("en-cmu.dict")==0||filename.compareTo("en-us.lm.dmp")==0)
         	resourcePath = RESOURCE_BASE_PATH+filename;
-        else
-        	resourcePath = RESOURCE_BASE_PATH_ACOUSTIC+filename;
+        //else
+        //	resourcePath = RESOURCE_BASE_PATH_ACOUSTIC+filename;
 
 
         URL dataFile = getClass().getClassLoader().getResource(resourcePath);
