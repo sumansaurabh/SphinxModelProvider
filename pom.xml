@@ -38,12 +38,20 @@
         <configuration>
           <instructions>
             <Export-Package>
-              org.apache.stanbol.commons.sphinx;version=${project.version} 
+             
+
             </Export-Package>
+            <_exportcontents>
+              org.apache.stanbol.commons.sphinx;version=${project.version} 
+              <!-- org.apache.stanbol.commons.sphinx.model;version=${project.version}  -->
+            </_exportcontents>
             <Import-Package>
-              org.apache.stanbol.commons.sphinx,
+              org.apache.stanbol.commons.sphinx;provide:=true; version=${project.version},
               *
             </Import-Package>
+            <Private-Package>
+              org.apache.stanbol.commons.sphinx.impl.*;version=${project.version}
+            </Private-Package>
           </instructions>
         </configuration>
       </plugin>

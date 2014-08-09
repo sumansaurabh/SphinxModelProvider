@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.apache.stanbol.commons.sphinx.impl.ModelProviderImpl;
 import org.junit.After;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SphinxModelTest {
 	
-	private static ModelProviderImpl MP;
+	private static ModelProvider MP;
     private static final Logger log = LoggerFactory.getLogger(SphinxModelTest.class);
 
     @Before
@@ -108,7 +110,8 @@ public class SphinxModelTest {
     @After
     public void unbindServices() {
     	log.info(">> Cleaning resources <<");
-       	MP.deactivate(null);
+        ModelProviderImpl mp=(ModelProviderImpl)MP;
+       	mp.deactivate(null);
     	MP=null;
     }
 	

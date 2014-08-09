@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package org.apache.stanbol.commons.sphinx;
+package org.apache.stanbol.commons.sphinx.impl;
 
 
 import java.io.File;
@@ -27,22 +27,26 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.apache.stanbol.commons.sphinx.AcousticModel;
+import org.apache.stanbol.commons.sphinx.BaseModel;
+import org.apache.stanbol.commons.sphinx.DictionaryModel;
+import org.apache.stanbol.commons.sphinx.LanguageModel;
+import org.apache.stanbol.commons.sphinx.ModelProvider;
+
 import org.apache.stanbol.commons.stanboltools.datafileprovider.DataFileProvider;
+import org.osgi.framework.Constants;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * * OSGI service that let you load Sphinx Models via the Stanbol 
- * {@link DataFileProvider} infrastructure. This allows users to copy models
- * to the 'datafiles' directory or developer to provide models via via OSGI
- * bundles.<p>
- * This service also provides methods that directly return the Sphinx component
- * wrapping the model.
  * Makes the Model file available to {@link SpeechToTextEngine}.
  * 
  * Currently InputStream provided by DataFileProvider is saved as 
@@ -53,8 +57,9 @@ import org.slf4j.LoggerFactory;
  *
  */
 @Component(immediate=true)
-@Service(value=ModelProviderImpl.class)
-public class ModelProviderImpl{
+@Service(ModelProvider.class)
+@Property(name=Constants.SERVICE_RANKING, intValue=Integer.MAX_VALUE)
+public class ModelProviderImpl implements ModelProvider{
 	/**
      * The logger
      */
@@ -68,14 +73,12 @@ public class ModelProviderImpl{
     */
     protected Map<HashSet<String>, BaseModel> models = new HashMap<HashSet<String>,BaseModel>();
     
-    private String bundleSymbolicName=null;
-            //"org.apache.stanbol.sphinx.model.language"; //Getter for bundle symbolic name
+    private String bundleSymbolicName=null; //Getter for bundle symbolic name
     
     /**
      * Default constructor
      */
     public ModelProviderImpl(){ 
-    	super();
     }
     /**
      * Constructor intended to be used when running outside an OSGI environment
@@ -83,34 +86,24 @@ public class ModelProviderImpl{
      * @param dataFileProvider the dataFileProvider used to load Model data.
      */
     public ModelProviderImpl(DataFileProvider dataFileProvider){
-        this();
         this.dataFileProvider = dataFileProvider;
     }
+    @Activate
+    protected void activate(ComponentContext ctx) throws ConfigurationException {
+    }
     
-    
-    /**
-	 * Initializes the Model files for the @langauge and {@link LanguageModel}, {@link AcousticModel}, {@link DictionaryModel}
-	 * @param modelType {@link LanguageModel}, {@link AcousticModel}, {@link DictionaryModel}
-	 * @return 
-	 */
+	@Override
 	public BaseModel getModel(HashSet<String> models, BaseModel modelType, String bundleSymbolicName) {
 		this.bundleSymbolicName=bundleSymbolicName;
 		return initModel(models,modelType);		
 	}
-	/**
-	 * Initializes the Model files for the @models and @modeType { AcousticModel, LanguageModel, DictionaryModel }
-         * @param language
-	 * @param modelType {@link LanguageModel}, {@link AcousticModel}, {@link DictionaryModel}
-	 * @return
-	 */
+	
+	@Override
 	public BaseModel getDefaultModel(String language, BaseModel modelType ) {
-               log.info("\n################load language {} via the DataFileProvider",language);
-
 		return initModel(modelType.getDefaultModel(language),modelType);
 	}
 	
-	    private static final String DOWNLOAD_ROOT = "http://opennlp.sourceforge.net/models-1.5/";
-
+	
 	/**
 	 * Initializes the Model files i.e. storing the copy in /tmp folder
 	 * @param name Model File name set
@@ -119,9 +112,8 @@ public class ModelProviderImpl{
 	 */
     
     @SuppressWarnings("unchecked")
-	private <T> T initModel(HashSet<String> name, BaseModel modelType) {
-            log.info("\n################load model {} via the DataFileProvider",name);
-            Map<String,String>modelProperties = new HashMap<String,String>();
+    private <T> T initModel(HashSet<String> name, BaseModel modelType) {
+        System.out.println(">>>Model name = "+models);
     	Object model = models.get(name);
         if(model != null) {
             if(modelType.getClass().isAssignableFrom(model.getClass())){
@@ -134,35 +126,22 @@ public class ModelProviderImpl{
             }
         } 
         else {
-                if(!modelProperties.containsKey("Description")){
-                    modelProperties.put("Description", "Statistical model for Sphinx");
-                }
-                if(!modelProperties.containsKey("Model Type")){
-                    modelProperties.put("Model Type", modelType.toString());
-                }
-                if(!modelProperties.containsKey("Download Location")){
-                    modelProperties.put("Download Location", DOWNLOAD_ROOT+name);
-                }
         	InputStream modelDataStream;
         	for(String modelname: name)
         	{
-                        log.info("\n################load model {} via the DataFileProvider",modelname);
-
         		try {
-        			//modelDataStream = lookupModelStream(modelname,modelProperties);
-                                    System.out.println("Looking for model name = '"+modelname+"' and bundleprop ='"+bundleSymbolicName+"'");
-
-                            modelDataStream=lookupModelStream(modelname,modelProperties);
+        			modelDataStream = lookupModelStream(modelname);
         		} catch (IOException e) {
-                                  System.out.println("Exception : Uable to load Resource via the DataFileProvider = '"+modelname+"' and bundlename ='"+bundleSymbolicName+"'");
+                                    System.out.println("Getting to IOException"+models);
 
         			log.debug("Unable to load Resource {} via the DataFileProvider",name);
         			return null;
         		}
         		if(modelDataStream == null){
-                                System.out.println("NULL : Uable to load Resource via the DataFileProvider = '"+modelname+"' and bundlename ='"+bundleSymbolicName+"'");
+                            System.out.println("Getting to null");
+        			log.debug("Null: Unable to load Resource {} via the DataFileProvider",name);
+                                log.info("^^^^^Null: Unable to load Resource {} via the DataFileProvider",name);
 
-        			log.debug("Unable to load Resource {} via the DataFileProvider",name);
         			return null;
         		}
         		try {
@@ -208,22 +187,18 @@ public class ModelProviderImpl{
     /**
      * Lookup an Sphinx data file via the {@link #dataFileProvider}
      * @param modelName the name of the model
-     * @param properties
      * @return the stream or <code>null</code> if not found
      * @throws IOException an any error while opening the model file
      */
-    protected InputStream lookupModelStream(final String modelName,final Map<String,String> properties) throws IOException {
-        log.debug("Looking for model name = '{}' and bundlename ='{}'",modelName,bundleSymbolicName);
-        System.out.println("Looking for model name = '"+modelName+"' and bundlename ='"+bundleSymbolicName+"'");
+    protected InputStream lookupModelStream(final String modelName) throws IOException {
         try {
             return AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
                 @Override
                 public InputStream run() throws IOException {
-                            return dataFileProvider.getInputStream(bundleSymbolicName, modelName,properties);
+                    return dataFileProvider.getInputStream(bundleSymbolicName, modelName,null);
                 }
             });
         } catch (PrivilegedActionException pae) {
-            
             Exception e = pae.getException();
             if(e instanceof IOException){
                 throw (IOException)e;
@@ -248,6 +223,7 @@ public class ModelProviderImpl{
      * Remove the Model files when they become unavialbe to Stanbol
      * @param modelType {@link LanguageModel}, {@link AcousticModel}, {@link DictionaryModel} 
      */
+    @Override
     public void removeUnavailableResource(BaseModel modelType) {
     	File directory = new File(models.get(modelType).toString());
     	if(directory.exists()){
