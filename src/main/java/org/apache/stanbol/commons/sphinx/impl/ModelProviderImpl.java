@@ -113,7 +113,6 @@ public class ModelProviderImpl implements ModelProvider{
     
     @SuppressWarnings("unchecked")
     private <T> T initModel(HashSet<String> name, BaseModel modelType) {
-        System.out.println(">>>Model name = "+models);
     	Object model = models.get(name);
         if(model != null) {
             if(modelType.getClass().isAssignableFrom(model.getClass())){
@@ -132,16 +131,11 @@ public class ModelProviderImpl implements ModelProvider{
         		try {
         			modelDataStream = lookupModelStream(modelname);
         		} catch (IOException e) {
-                                    System.out.println("Getting to IOException"+models);
-
         			log.debug("Unable to load Resource {} via the DataFileProvider",name);
         			return null;
         		}
         		if(modelDataStream == null){
-                            System.out.println("Getting to null");
         			log.debug("Null: Unable to load Resource {} via the DataFileProvider",name);
-                                log.info("^^^^^Null: Unable to load Resource {} via the DataFileProvider",name);
-
         			return null;
         		}
         		try {
